@@ -1,0 +1,62 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email == "adm123@gmail.com";
+    }
+
+    function isValidReservationCreate() {
+      let data = request.resource.data;
+      return data.keys().hasOnly([
+          "quadra",
+          "tipoQuadra",
+          "data",
+          "horarios",
+          "status",
+          "nomeCliente",
+          "telefoneCliente",
+          "createdAt"
+        ])
+        && data.quadra is string
+        && data.tipoQuadra is string
+        && data.data is string
+        && data.horarios is list
+        && data.horarios.size() > 0
+        && data.horarios.size() <= 5
+        && data.status == "reservado"
+        && data.nomeCliente is string
+        && data.telefoneCliente is string
+        && data.createdAt is string;
+    }
+
+    function isValidClientCreate() {
+      let data = request.resource.data;
+      return data.keys().hasOnly([
+          "nomeCliente",
+          "telefoneCliente",
+          "ultimaReservaEm",
+          "origem"
+        ])
+        && data.nomeCliente is string
+        && data.telefoneCliente is string
+        && data.ultimaReservaEm is string
+        && data.origem == "site";
+    }
+
+    match /reservas/{reservaId} {
+      allow create: if isValidReservationCreate();
+      allow read, update, delete: if isAdmin();
+    }
+
+    match /clientes/{clienteId} {
+      allow create: if isValidClientCreate();
+      allow read, update, delete: if isAdmin();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
