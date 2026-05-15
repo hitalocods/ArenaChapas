@@ -12,6 +12,7 @@ export function useBooking() {
   const [isLoadingSlots, setIsLoadingSlots] = useState(false);
   const [customer, setCustomer] = useState({ nomeCliente: '', telefoneCliente: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   useEffect(() => {
     if (!selectedCourt || !selectedDate) {
@@ -79,6 +80,7 @@ export function useBooking() {
   async function submitBooking() {
     if (!canSubmit) return null;
     setIsSubmitting(true);
+    setSubmitError('');
 
     const payload = {
       quadra: selectedCourt.name,
@@ -91,30 +93,36 @@ export function useBooking() {
       telefoneCliente: customer.telefoneCliente.trim(),
     };
 
-    await createReservation(payload);
-    setSlotStatuses((current) => ({
-      ...current,
-      ...selectedTimes.reduce((acc, time) => {
-        acc[time] = 'reservado';
-        return acc;
-      }, {}),
-    }));
-    setSelectedTimes([]);
+    try {
+      await createReservation(payload);
+      setSlotStatuses((current) => ({
+        ...current,
+        ...selectedTimes.reduce((acc, time) => {
+          acc[time] = 'reservado';
+          return acc;
+        }, {}),
+      }));
+      setSelectedTimes([]);
 
-    const message = [
-      'Ola, gostaria de reservar uma quadra na Arena Os Chapas.',
-      '',
-      `Quadra: ${payload.quadra} - ${payload.tipoQuadra}`,
-      `Dia: ${payload.data}`,
-      `Horarios: ${payload.horarios.join(', ')}`,
-      `Nome: ${payload.nomeCliente}`,
-      `Telefone: ${payload.telefoneCliente}`,
-    ].join('\n');
+      const message = [
+        'Ola, gostaria de reservar uma quadra na Arena Os Chapas.',
+        '',
+        `Quadra: ${payload.quadra} - ${payload.tipoQuadra}`,
+        `Dia: ${payload.data}`,
+        `Horarios: ${payload.horarios.join(', ')}`,
+        `Nome: ${payload.nomeCliente}`,
+        `Telefone: ${payload.telefoneCliente}`,
+      ].join('\n');
 
-    const whatsappUrl = `https://wa.me/${arenaInfo.whatsapp}?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
-    setIsSubmitting(false);
-    return payload;
+      const whatsappUrl = `https://wa.me/${arenaInfo.whatsapp}?text=${encodeURIComponent(message)}`;
+      window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+      return payload;
+    } catch {
+      setSubmitError('Nao foi possivel concluir. Atualize a agenda e tente outro horario.');
+      return null;
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return {
@@ -126,6 +134,7 @@ export function useBooking() {
     customer,
     canSubmit,
     isSubmitting,
+    submitError,
     setSelectedCourt: selectCourt,
     setSelectedDate: selectDate,
     toggleTime,

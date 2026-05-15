@@ -1,5 +1,4 @@
 import {
-  addDoc,
   collection,
   deleteDoc,
   doc,
@@ -8,6 +7,7 @@ import {
   setDoc,
   updateDoc,
   where,
+  writeBatch,
 } from 'firebase/firestore';
 import { db, isFirebaseConfigured } from './firebase';
 
@@ -41,26 +41,36 @@ export async function createReservation(payload) {
     return { id: `local-${Date.now()}`, ...payload };
   }
 
-  const docRef = await addDoc(collection(db, collectionName), {
+  const batch = writeBatch(db);
+  const docRef = doc(collection(db, collectionName));
+  const clientRef = doc(collection(db, clientsCollectionName));
+  const createdAt = new Date().toISOString();
+
+  batch.set(docRef, {
     ...payload,
-    createdAt: new Date().toISOString(),
+    createdAt,
   });
 
-  await addDoc(collection(db, clientsCollectionName), {
+  batch.set(clientRef, {
     nomeCliente: payload.nomeCliente,
     telefoneCliente: payload.telefoneCliente,
-    ultimaReservaEm: new Date().toISOString(),
+    ultimaReservaEm: createdAt,
     origem: 'site',
   });
 
-  await Promise.all(payload.horarios.map((horario) => saveScheduleSlot({
-    quadraId: payload.quadraId,
-    quadra: payload.quadra,
-    data: payload.data,
-    horario,
-    status: payload.status,
-    reservaId: docRef.id,
-  })));
+  payload.horarios.forEach((horario) => {
+    batch.set(getScheduleSlotRef(payload.quadraId, payload.data, horario), {
+      quadraId: payload.quadraId,
+      quadra: payload.quadra,
+      data: payload.data,
+      horario,
+      status: payload.status,
+      reservaId: docRef.id,
+      updatedAt: createdAt,
+    });
+  });
+
+  await batch.commit();
 
   return { id: docRef.id, ...payload };
 }
@@ -144,11 +154,15 @@ export async function getScheduleSlots({ quadraId, data }) {
 }
 
 function saveScheduleSlot(slot) {
-  const slotId = `${slot.quadraId}_${slot.data}_${slot.horario.replace(':', '')}`;
-  return setDoc(doc(db, scheduleCollectionName, slotId), {
+  return setDoc(getScheduleSlotRef(slot.quadraId, slot.data, slot.horario), {
     ...slot,
     updatedAt: new Date().toISOString(),
   });
+}
+
+function getScheduleSlotRef(quadraId, data, horario) {
+  const slotId = `${quadraId}_${data}_${horario.replace(':', '')}`;
+  return doc(db, scheduleCollectionName, slotId);
 }
 
 function courtNameToId(name) {

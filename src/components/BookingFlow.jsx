@@ -13,6 +13,7 @@ export function BookingFlow({ booking }) {
     customer,
     canSubmit,
     isSubmitting,
+    submitError,
     setSelectedDate,
     toggleTime,
     updateCustomer,
@@ -138,6 +139,7 @@ export function BookingFlow({ booking }) {
               <Send size={18} />
               {isSubmitting ? 'Enviando...' : 'Reservar Horarios'}
             </button>
+            {submitError && <p className="booking-error">{submitError}</p>}
           </div>
         </div>
       </div>

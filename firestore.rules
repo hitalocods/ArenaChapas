@@ -74,7 +74,8 @@ service cloud.firestore {
         && request.resource.data.horario is string
         && request.resource.data.status == "reservado"
         && request.resource.data.reservaId is string
-        && request.resource.data.updatedAt is string;
+        && request.resource.data.updatedAt is string
+        && existsAfter(/databases/$(database)/documents/reservas/$(request.resource.data.reservaId));
       allow update, delete: if isAdmin();
     }
 
