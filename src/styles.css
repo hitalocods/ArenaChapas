@@ -455,16 +455,19 @@ button:disabled {
   min-height: 100vh;
   padding: 1.25rem;
   background:
-    radial-gradient(circle at 20% 0%, rgba(191, 233, 255, 0.42), transparent 24rem),
-    linear-gradient(180deg, #f8fbff, #f8fafc);
+    radial-gradient(circle at 12% 0%, rgba(56, 189, 248, 0.18), transparent 26rem),
+    radial-gradient(circle at 90% 8%, rgba(255, 213, 79, 0.13), transparent 18rem),
+    linear-gradient(180deg, #eef8ff, #f8fafc 42%, #f1f5f9);
 }
 
 .admin-topbar {
   align-items: center;
-  background: rgba(255, 255, 255, 0.86);
-  border: 1px solid #e0f2fe;
-  border-radius: 1.6rem;
-  box-shadow: 0 20px 55px rgba(8, 36, 95, 0.08);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(232, 247, 255, 0.9)),
+    radial-gradient(circle at 0% 0%, rgba(255, 213, 79, 0.14), transparent 18rem);
+  border: 1px solid rgba(186, 230, 253, 0.9);
+  border-radius: 1.45rem;
+  box-shadow: 0 22px 60px rgba(8, 36, 95, 0.12);
   display: flex;
   gap: 1rem;
   justify-content: space-between;
@@ -480,7 +483,7 @@ button:disabled {
 .admin-topbar h1,
 .admin-login h1 {
   color: #0f172a;
-  font-size: clamp(1.7rem, 4vw, 3rem);
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
   font-weight: 950;
   line-height: 1;
 }
@@ -493,8 +496,13 @@ button:disabled {
 }
 
 .admin-brand img {
-  height: 3.2rem;
-  width: 3.2rem;
+  background: #ffffff;
+  border: 1px solid #e0f2fe;
+  border-radius: 1rem;
+  box-shadow: 0 10px 24px rgba(8, 36, 95, 0.08);
+  height: 3.35rem;
+  padding: 0.18rem;
+  width: 3.35rem;
   object-fit: contain;
 }
 
@@ -512,16 +520,17 @@ button:disabled {
 }
 
 .admin-icon-action {
-  background: #eff9ff;
+  background: #0f172a;
   color: #0369a1;
+  color: #ffffff;
   width: 2.55rem;
 }
 
 .admin-logout,
 .admin-clear {
-  background: #ffffff;
-  border: 1px solid #dbeafe;
-  color: #334155;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  color: #0f172a;
   padding: 0 0.9rem;
 }
 
@@ -567,12 +576,25 @@ button:disabled {
 }
 
 .admin-card {
-  background: #ffffff;
-  border: 1px solid #e0f2fe;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(186, 230, 253, 0.9);
   border-radius: 1.6rem;
-  box-shadow: 0 20px 55px rgba(8, 36, 95, 0.08);
+  box-shadow: 0 22px 58px rgba(8, 36, 95, 0.09);
   margin-top: 1rem;
   padding: 1rem;
+  overflow: hidden;
+  position: relative;
+}
+
+.admin-card::before {
+  background: linear-gradient(90deg, #38bdf8, #fde68a, #e0f2fe);
+  content: "";
+  display: block;
+  height: 0.25rem;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
 }
 
 .admin-section-heading {
@@ -581,10 +603,6 @@ button:disabled {
   gap: 1rem;
   justify-content: space-between;
   margin-bottom: 1rem;
-}
-
-.admin-section-heading h2,
-.admin-report-head {
 }
 
 .admin-section-heading h2,
@@ -601,6 +619,36 @@ button:disabled {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.admin-stats .stat-card:nth-child(1) {
+  background: linear-gradient(135deg, #eff6ff, #ffffff);
+  border-color: #bfdbfe;
+}
+
+.admin-stats .stat-card:nth-child(1) span {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.admin-stats .stat-card:nth-child(2) {
+  background: linear-gradient(135deg, #fffbeb, #ffffff);
+  border-color: #fde68a;
+}
+
+.admin-stats .stat-card:nth-child(2) span {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.admin-stats .stat-card:nth-child(3) {
+  background: linear-gradient(135deg, #f1f5f9, #ffffff);
+  border-color: #cbd5e1;
+}
+
+.admin-stats .stat-card:nth-child(3) span {
+  background: #e2e8f0;
+  color: #334155;
+}
+
 .admin-report-head {
   align-items: start;
   display: grid;
@@ -615,15 +663,18 @@ button:disabled {
 }
 
 .admin-report-controls select,
-.admin-report-controls input {
+.admin-report-controls input,
+.admin-filters input,
+.admin-filters select {
   width: 100%;
-  border: 1px solid #dbeafe;
+  border: 1px solid #cfe8f8;
   border-radius: 1rem;
-  background: #f8fafc;
+  background: #ffffff;
   color: #0f172a;
   font-weight: 800;
   outline: none;
   padding: 0.85rem 0.95rem;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.04);
 }
 
 .admin-report-stats {
@@ -631,6 +682,30 @@ button:disabled {
   gap: 0.85rem;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   margin-top: 1rem;
+}
+
+.admin-report-stats .stat-card {
+  background: #f8fbff;
+}
+
+.admin-report-stats .stat-card:nth-child(1) span {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.admin-report-stats .stat-card:nth-child(2) span {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.admin-report-stats .stat-card:nth-child(3) span {
+  background: #e2e8f0;
+  color: #334155;
+}
+
+.admin-report-stats .stat-card:nth-child(4) span {
+  background: #fef3c7;
+  color: #b45309;
 }
 
 .court-report-grid {
@@ -641,8 +716,10 @@ button:disabled {
 }
 
 .court-report-card {
-  background: linear-gradient(135deg, #f8fafc, #eff9ff);
-  border: 1px solid #dbeafe;
+  background:
+    linear-gradient(135deg, #ffffff, #eff9ff),
+    radial-gradient(circle at 100% 0%, rgba(56, 189, 248, 0.16), transparent 10rem);
+  border: 1px solid #bae6fd;
   border-radius: 1.1rem;
   padding: 0.95rem;
 }
@@ -677,6 +754,12 @@ button:disabled {
   display: flex;
   gap: 1rem;
   padding: 1rem;
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.stat-card:hover {
+  box-shadow: 0 16px 38px rgba(8, 36, 95, 0.1);
+  transform: translateY(-2px);
 }
 
 .stat-card strong {
@@ -715,9 +798,17 @@ button:disabled {
 }
 
 .reservation-card {
-  background: linear-gradient(180deg, #ffffff, #fbfdff);
-  border-color: #dbeafe;
+  background: #ffffff;
+  border: 1px solid #dbeafe;
+  box-shadow: 0 16px 42px rgba(8, 36, 95, 0.07);
   padding: 1rem;
+  transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.reservation-card:hover {
+  border-color: #7dd3fc;
+  box-shadow: 0 20px 55px rgba(8, 36, 95, 0.11);
+  transform: translateY(-2px);
 }
 
 .reservation-main {
@@ -741,8 +832,8 @@ button:disabled {
 
 .client-block {
   align-items: center;
-  background: #f8fbff;
-  border: 1px solid #e0f2fe;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
   border-radius: 1.1rem;
   color: #64748b;
   display: grid;
@@ -767,16 +858,19 @@ button:disabled {
 
 .status-reservado {
   background: #fef3c7;
+  border: 1px solid #fde68a;
   color: #92400e;
 }
 
 .status-confirmado {
   background: #e2e8f0;
+  border: 1px solid #cbd5e1;
   color: #334155;
 }
 
 .status-disponivel {
   background: #dbeafe;
+  border: 1px solid #bfdbfe;
   color: #075985;
 }
 
@@ -789,7 +883,7 @@ button:disabled {
 
 .admin-time {
   align-items: center;
-  background: #f8fafc;
+  background: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: 0.9rem;
   color: #64748b;
@@ -802,7 +896,7 @@ button:disabled {
 }
 
 .admin-time.active {
-  background: #e0f2fe;
+  background: linear-gradient(135deg, #e0f2fe, #ffffff);
   border-color: #7dd3fc;
   color: #0369a1;
   box-shadow: 0 10px 24px rgba(56, 189, 248, 0.13);
@@ -826,6 +920,13 @@ button:disabled {
   font-weight: 900;
   gap: 0.35rem;
   padding: 0.65rem 0.85rem;
+  transition: 150ms ease;
+}
+
+.reservation-actions button:hover {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  color: #1d4ed8;
 }
 
 .reservation-actions .danger {
