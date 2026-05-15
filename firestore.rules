@@ -11,6 +11,7 @@ service cloud.firestore {
       let data = request.resource.data;
       return data.keys().hasOnly([
           "quadra",
+          "quadraId",
           "tipoQuadra",
           "data",
           "horarios",
@@ -20,6 +21,7 @@ service cloud.firestore {
           "createdAt"
         ])
         && data.quadra is string
+        && data.quadraId is string
         && data.tipoQuadra is string
         && data.data is string
         && data.horarios is list
@@ -53,6 +55,27 @@ service cloud.firestore {
     match /clientes/{clienteId} {
       allow create: if isValidClientCreate();
       allow read, update, delete: if isAdmin();
+    }
+
+    match /agenda/{slotId} {
+      allow read: if true;
+      allow create: if request.resource.data.keys().hasOnly([
+          "quadraId",
+          "quadra",
+          "data",
+          "horario",
+          "status",
+          "reservaId",
+          "updatedAt"
+        ])
+        && request.resource.data.quadraId is string
+        && request.resource.data.quadra is string
+        && request.resource.data.data is string
+        && request.resource.data.horario is string
+        && request.resource.data.status == "reservado"
+        && request.resource.data.reservaId is string
+        && request.resource.data.updatedAt is string;
+      allow update, delete: if isAdmin();
     }
 
     match /{document=**} {

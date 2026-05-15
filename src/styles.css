@@ -242,6 +242,48 @@ button:disabled {
   backdrop-filter: blur(16px);
 }
 
+.booking-warning {
+  align-items: center;
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 1.25rem;
+  color: #9a3412;
+  display: grid;
+  gap: 0.8rem;
+  grid-template-columns: auto 1fr auto;
+  margin-bottom: 1rem;
+  padding: 0.9rem;
+}
+
+.booking-warning strong,
+.booking-warning span {
+  display: block;
+}
+
+.booking-warning strong {
+  color: #7c2d12;
+  font-size: 0.9rem;
+  font-weight: 950;
+}
+
+.booking-warning span {
+  color: #9a3412;
+  font-size: 0.82rem;
+  font-weight: 750;
+  margin-top: 0.1rem;
+}
+
+.booking-warning a {
+  background: #ffffff;
+  border: 1px solid #fed7aa;
+  border-radius: 999px;
+  color: #9a3412;
+  font-size: 0.78rem;
+  font-weight: 950;
+  padding: 0.55rem 0.75rem;
+  white-space: nowrap;
+}
+
 .step-chip {
   display: inline-flex;
   border-radius: 999px;
@@ -296,6 +338,12 @@ button:disabled {
 .input:focus {
   border-color: #7dd3fc;
   box-shadow: 0 0 0 4px rgba(125, 211, 252, 0.24);
+}
+
+.field-card input:disabled {
+  color: #94a3b8;
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 
 .time-card {
@@ -871,6 +919,16 @@ button:disabled {
 
   .booking-panel {
     border-radius: 1.35rem;
+  }
+
+  .booking-warning {
+    align-items: stretch;
+    grid-template-columns: auto 1fr;
+  }
+
+  .booking-warning a {
+    grid-column: 1 / -1;
+    text-align: center;
   }
 
   .field-card {

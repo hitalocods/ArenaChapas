@@ -72,7 +72,7 @@ export function AdminPage({ onBack }) {
     const horarios = reservation.horarios.includes(time)
       ? reservation.horarios.filter((item) => item !== time)
       : [...reservation.horarios, time].sort();
-    await updateReservationTimes(reservation.id, horarios);
+    await updateReservationTimes(reservation.id, reservation, horarios);
     setReservations((current) =>
       current.map((item) => (item.id === reservation.id ? { ...item, horarios } : item)),
     );

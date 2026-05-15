@@ -1,18 +1,15 @@
 import { motion } from 'framer-motion';
-import { CalendarDays, CheckCircle2, Clock3, Send, UserRound } from 'lucide-react';
+import { AlertCircle, CalendarDays, CheckCircle2, Clock3, Send, UserRound } from 'lucide-react';
 import { statusLabels, statusStyles, timeSlots } from '../data/arenaData';
 import { Section } from './ui/Section';
-
-const demoStatus = {
-  '19:00': 'reservado',
-  '22:00': 'confirmado',
-};
 
 export function BookingFlow({ booking }) {
   const {
     selectedCourt,
     selectedDate,
     selectedTimes,
+    slotStatuses,
+    isLoadingSlots,
     customer,
     canSubmit,
     isSubmitting,
@@ -57,6 +54,17 @@ export function BookingFlow({ booking }) {
         </div>
 
         <div className="booking-panel">
+          {!selectedCourt && (
+            <div className="booking-warning">
+              <AlertCircle size={18} />
+              <div>
+                <strong>Selecione a quadra primeiro</strong>
+                <span>Depois escolha o dia e os horarios disponiveis.</span>
+              </div>
+              <a href="#quadras">Escolher quadra</a>
+            </div>
+          )}
+
           <div className="grid gap-4 sm:grid-cols-2">
             <label id="booking-day" className="field-card">
               <span>
@@ -67,6 +75,7 @@ export function BookingFlow({ booking }) {
                 type="date"
                 value={selectedDate}
                 min={new Date().toISOString().slice(0, 10)}
+                disabled={!selectedCourt}
                 onChange={(event) => setSelectedDate(event.target.value)}
               />
             </label>
@@ -76,16 +85,20 @@ export function BookingFlow({ booking }) {
                 3. Horario
               </span>
               <strong className="text-sm text-slate-950">
-                {selectedTimes.length ? selectedTimes.join(', ') : 'Nenhum horario selecionado'}
+                {isLoadingSlots
+                  ? 'Carregando agenda...'
+                  : selectedTimes.length
+                    ? selectedTimes.join(', ')
+                    : 'Nenhum horario selecionado'}
               </strong>
             </div>
           </div>
 
           <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-5">
             {timeSlots.map((time) => {
-              const status = demoStatus[time] || 'disponivel';
+              const status = selectedCourt ? slotStatuses[time] || 'disponivel' : 'confirmado';
               const selected = selectedTimes.includes(time);
-              const disabled = status === 'confirmado' || !selectedCourt;
+              const disabled = status !== 'disponivel' || !selectedCourt || isLoadingSlots;
               return (
                 <motion.button
                   key={time}
@@ -96,7 +109,7 @@ export function BookingFlow({ booking }) {
                   className={`time-card ${statusStyles[status]} ${selected ? 'time-card-selected' : ''}`}
                 >
                   <strong>{time}</strong>
-                  <span>{selected ? 'Selecionado' : statusLabels[status]}</span>
+                  <span>{!selectedCourt ? 'Escolha quadra' : selected ? 'Selecionado' : statusLabels[status]}</span>
                 </motion.button>
               );
             })}

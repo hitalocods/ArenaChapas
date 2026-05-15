@@ -1,6 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { arenaInfo } from '../data/arenaData';
-import { createReservation } from '../services/reservationService';
+import { createReservation, getScheduleSlots } from '../services/reservationService';
 
 const today = new Date().toISOString().slice(0, 10);
 
@@ -8,8 +8,40 @@ export function useBooking() {
   const [selectedCourt, setSelectedCourt] = useState(null);
   const [selectedDate, setSelectedDate] = useState(today);
   const [selectedTimes, setSelectedTimes] = useState([]);
+  const [slotStatuses, setSlotStatuses] = useState({});
+  const [isLoadingSlots, setIsLoadingSlots] = useState(false);
   const [customer, setCustomer] = useState({ nomeCliente: '', telefoneCliente: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (!selectedCourt || !selectedDate) {
+      Promise.resolve().then(() => setSlotStatuses({}));
+      return undefined;
+    }
+
+    let active = true;
+
+    async function loadSlots() {
+      await Promise.resolve();
+      if (!active) return;
+      setIsLoadingSlots(true);
+      const slots = await getScheduleSlots({ quadraId: selectedCourt.id, data: selectedDate });
+      if (!active) return;
+      setSlotStatuses(
+        slots.reduce((acc, slot) => {
+          acc[slot.horario] = slot.status;
+          return acc;
+        }, {}),
+      );
+      setIsLoadingSlots(false);
+    }
+
+    loadSlots();
+
+    return () => {
+      active = false;
+    };
+  }, [selectedCourt, selectedDate]);
 
   const canSubmit = useMemo(
     () =>
@@ -22,11 +54,22 @@ export function useBooking() {
   );
 
   function toggleTime(time) {
+    if (!selectedCourt || slotStatuses[time]) return;
     setSelectedTimes((current) =>
       current.includes(time)
         ? current.filter((item) => item !== time)
         : [...current, time].sort(),
     );
+  }
+
+  function selectCourt(court) {
+    setSelectedCourt(court);
+    setSelectedTimes([]);
+  }
+
+  function selectDate(date) {
+    setSelectedDate(date);
+    setSelectedTimes([]);
   }
 
   function updateCustomer(field, value) {
@@ -39,6 +82,7 @@ export function useBooking() {
 
     const payload = {
       quadra: selectedCourt.name,
+      quadraId: selectedCourt.id,
       tipoQuadra: selectedCourt.type,
       data: selectedDate,
       horarios: selectedTimes,
@@ -48,6 +92,14 @@ export function useBooking() {
     };
 
     await createReservation(payload);
+    setSlotStatuses((current) => ({
+      ...current,
+      ...selectedTimes.reduce((acc, time) => {
+        acc[time] = 'reservado';
+        return acc;
+      }, {}),
+    }));
+    setSelectedTimes([]);
 
     const message = [
       'Ola, gostaria de reservar uma quadra na Arena Os Chapas.',
@@ -69,11 +121,13 @@ export function useBooking() {
     selectedCourt,
     selectedDate,
     selectedTimes,
+    slotStatuses,
+    isLoadingSlots,
     customer,
     canSubmit,
     isSubmitting,
-    setSelectedCourt,
-    setSelectedDate,
+    setSelectedCourt: selectCourt,
+    setSelectedDate: selectDate,
     toggleTime,
     updateCustomer,
     submitBooking,
